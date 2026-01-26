@@ -1,0 +1,102 @@
+// Define default values for all stage controls
+def defaults = [
+    'stage.build.enabled': 'true',
+    'stage.unit.tests.enabled': 'true',
+    'stage.integration.tests.enabled': 'true',
+    'stage.security.scan.enabled': 'true',
+    'stage.deploy.dev.enabled': 'true',
+    'stage.deploy.preprod.enabled': 'true',
+    'stage.deploy.prod.enabled': 'false'
+]
+
+def props = [:]
+
+// Load pipeline configuration before pipeline starts
+node {
+    checkout scm
+    props = readProperties(defaults: defaults, file: 'pipeline.properties')
+    echo "Pipeline Configuration Loaded:"
+    echo "  Build: ${props['stage.build.enabled']}"
+    echo "  Unit Tests: ${props['stage.unit.tests.enabled']}"
+    echo "  Integration Tests: ${props['stage.integration.tests.enabled']}"
+    echo "  Security Scan: ${props['stage.security.scan.enabled']}"
+    echo "  Deploy to Dev: ${props['stage.deploy.dev.enabled']}"
+    echo "  Deploy to Preprod: ${props['stage.deploy.preprod.enabled']}"
+    echo "  Deploy to Prod: ${props['stage.deploy.prod.enabled']}"
+}
+
+pipeline {
+    agent any
+    
+    stages {
+        
+        stage('Build') {
+            when {
+                expression { props['stage.build.enabled'] == 'true' }
+            }
+            steps {
+                echo "I built the application"
+            }
+        }
+        
+        stage('Unit Tests') {
+            when {
+                expression { props['stage.unit.tests.enabled'] == 'true' }
+            }
+            steps {
+                echo "I ran unit tests"
+            }
+        }
+        
+        stage('Integration Tests') {
+            when {
+                expression { props['stage.integration.tests.enabled'] == 'true' }
+            }
+            steps {
+                echo "I ran integration tests"
+            }
+        }
+        
+        stage('Security Scan') {
+            when {
+                expression { props['stage.security.scan.enabled'] == 'true' }
+            }
+            steps {
+                echo "I ran security scanning"
+            }
+        }
+        
+        stage('Deploy to Dev') {
+            when {
+                expression { props['stage.deploy.dev.enabled'] == 'true' }
+            }
+            steps {
+                echo "I deployed to Dev environment"
+            }
+        }
+        
+        stage('Deploy to Preprod') {
+            when {
+                expression { props['stage.deploy.preprod.enabled'] == 'true' }
+            }
+            steps {
+                echo "I deployed to Preprod environment"
+            }
+        }
+        
+        stage('Deploy to Production') {
+            when {
+                expression { props['stage.deploy.prod.enabled'] == 'true' }
+            }
+            steps {
+                echo "I deployed to Production environment"
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo "Pipeline execution completed"
+        }
+    }
+}
